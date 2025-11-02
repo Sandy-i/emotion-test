@@ -1,392 +1,214 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>分享解锁测试结果</title>
-    <link rel="stylesheet" href="common.css">
-    <style>
-        .share-container {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: var(--space-3);
-            position: relative;
-        }
+ <!DOCTYPE html>
+  <html lang="zh-CN">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0,
+   maximum-scale=1.0, user-scalable=no">
+      <title>正在生成结果 - 情绪颗粒度测试</title>
+      <link rel="stylesheet" href="common.css">
+      <style>
+          .share-gate-container {
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 20px;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2
+  100%);
+          }
 
-        .success-icon {
-            font-size: 80px;
-            margin-bottom: var(--space-3);
-            animation: bounce 1s ease-in-out;
-        }
+          .share-gate-content {
+              background: white;
+              border-radius: 24px;
+              padding: 48px 32px;
+              max-width: 500px;
+              width: 100%;
+              text-align: center;
+              box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+              animation: slideUp 0.5s ease-out;
+          }
 
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
-        }
+          @keyframes slideUp {
+              from {
+                  opacity: 0;
+                  transform: translateY(30px);
+              }
+              to {
+                  opacity: 1;
+                  transform: translateY(0);
+              }
+          }
 
-        .share-card {
-            background: white;
-            border-radius: var(--radius-xl);
-            padding: var(--space-4);
-            box-shadow: var(--shadow-lg);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
+          .gate-icon {
+              font-size: 80px;
+              margin-bottom: 24px;
+              animation: bounce 2s infinite;
+          }
 
-        .share-title {
-            font-size: 28px;
-            font-weight: 700;
-            background: var(--gradient-warm);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: var(--space-2);
-        }
+          @keyframes bounce {
+              0%, 100% { transform: translateY(0); }
+              50% { transform: translateY(-10px); }
+          }
 
-        .share-subtitle {
-            font-size: 16px;
-            color: var(--gray-600);
-            line-height: 1.6;
-            margin-bottom: var(--space-4);
-        }
+          .gate-title {
+              font-size: 28px;
+              font-weight: 700;
+              color: var(--text-primary);
+              margin-bottom: 16px;
+          }
 
-        .stats-preview {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: var(--space-2);
-            margin-bottom: var(--space-4);
-        }
+          .gate-subtitle {
+              font-size: 16px;
+              color: var(--text-secondary);
+              margin-bottom: 32px;
+              line-height: 1.6;
+          }
 
-        .stat-box {
-            background: var(--gray-50);
-            border-radius: var(--radius-md);
-            padding: var(--space-3);
-        }
+          .benefits {
+              background: var(--bg-secondary);
+              border-radius: 16px;
+              padding: 24px;
+              margin-bottom: 32px;
+              text-align: left;
+          }
 
-        .stat-icon {
-            font-size: 32px;
-            margin-bottom: var(--space-1);
-        }
+          .benefit-item {
+              padding: 12px 0;
+              color: var(--text-primary);
+              font-size: 15px;
+              line-height: 1.6;
+              border-bottom: 1px solid var(--border-color);
+          }
 
-        .stat-text {
-            font-size: 14px;
-            color: var(--gray-600);
-        }
+          .benefit-item:last-child {
+              border-bottom: none;
+          }
 
-        .unlock-methods {
-            margin-bottom: var(--space-4);
-        }
+          .countdown {
+              font-size: 64px;
+              font-weight: 700;
+              background: var(--gradient-warm);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              background-clip: text;
+              margin-bottom: 8px;
+          }
 
-        .method-title {
-            font-size: 14px;
-            color: var(--gray-600);
-            margin-bottom: var(--space-2);
-        }
+          .countdown-label {
+              font-size: 16px;
+              color: var(--text-secondary);
+              margin-bottom: 24px;
+          }
 
-        .share-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-2);
-        }
+          .skip-button {
+              width: 100%;
+              padding: 16px 32px;
+              background: var(--gradient-warm);
+              color: white;
+              border: none;
+              border-radius: 12px;
+              font-size: 16px;
+              font-weight: 600;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              box-shadow: 0 4px 12px rgba(108, 124, 231, 0.3);
+          }
 
-        .share-button {
-            width: 100%;
-            padding: var(--space-3);
-            border: none;
-            border-radius: var(--radius-lg);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all var(--transition-base);
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--space-1);
-        }
+          .skip-button:disabled {
+              opacity: 0.5;
+              cursor: not-allowed;
+          }
 
-        .share-button:active {
-            transform: scale(0.98);
-        }
+          .skip-button:not(:disabled):hover {
+              transform: translateY(-2px);
+              box-shadow: 0 6px 20px rgba(108, 124, 231, 0.4);
+          }
 
-        .share-wechat {
-            background: linear-gradient(135deg, #07C160 0%, #1AAD19 100%);
-            color: white;
-        }
+          .skip-button:not(:disabled):active {
+              transform: translateY(0);
+          }
+      </style>
+  </head>
+  <body>
+      <div class="share-gate-container">
+          <div class="share-gate-content">
+              <div class="gate-icon">🎉</div>
+              <div class="gate-title">测试完成！</div>
+              <div class="gate-subtitle">
+                  你已经完成了10道题的测试<br>
+                  正在为你生成个性化结果...
+              </div>
 
-        .share-moments {
-            background: linear-gradient(135deg, #FF8A65 0%, #FF7043 100%);
-            color: white;
-        }
+              <!-- 分享带来的好处 -->
+              <div class="benefits">
+                  <div class="benefit-item">✅
+  解锁完整测试结果和雷达图</div>
+                  <div class="benefit-item">✅ 获得个性化情绪提升建议</div>
+                  <div class="benefit-item">✅ 了解你的情绪表达特点</div>
+                  <div class="benefit-item">✅ 查看详细的情绪分析报告</div>
+              </div>
 
-        .share-link {
-            background: white;
-            border: 2px solid var(--primary-500);
-            color: var(--primary-500);
-        }
+              <!-- 倒计时查看结果 -->
+              <div id="skipSection">
+                  <div class="countdown" id="countdown">5</div>
+                  <div class="countdown-label">秒后可以查看结果</div>
+                  <button class="skip-button" id="skipButton"
+  onclick="skipShare()" disabled>
+                      查看我的测试结果 (<span id="skipTime">5</span>秒)
+                  </button>
+              </div>
+          </div>
+      </div>
 
-        .skip-button {
-            margin-top: var(--space-2);
-            padding: var(--space-2);
-            background: transparent;
-            border: none;
-            color: var(--gray-600);
-            font-size: 14px;
-            cursor: pointer;
-            transition: color var(--transition-base);
-        }
+      <script src="test-data.js"></script>
+      <script>
+          let countdownTimer;
+          let secondsLeft = 5;
 
-        .skip-button:hover {
-            color: var(--primary-500);
-        }
+          // 页面加载时开始倒计时
+          document.addEventListener('DOMContentLoaded', function() {
+              // 检查是否已经分享过
+              const hasShared =
+  localStorage.getItem('emotion_test_shared');
 
-        .benefits {
-            background: linear-gradient(135deg, rgba(108, 124, 231, 0.1) 0%, rgba(171, 123, 247, 0.1) 100%);
-            border-radius: var(--radius-md);
-            padding: var(--space-3);
-            margin-bottom: var(--space-4);
-        }
+              if (hasShared) {
+                  // 如果已经分享过，直接跳转
+                  viewResult();
+                  return;
+              }
 
-        .benefit-item {
-            display: flex;
-            align-items: center;
-            gap: var(--space-1);
-            margin-bottom: var(--space-1);
-            font-size: 14px;
-            color: var(--gray-700);
-        }
+              // 开始倒计时
+              startCountdown();
+          });
 
-        .benefit-item:last-child {
-            margin-bottom: 0;
-        }
+          function startCountdown() {
+              countdownTimer = setInterval(() => {
+                  secondsLeft--;
+                  document.getElementById('countdown').textContent =
+  secondsLeft;
+                  document.getElementById('skipTime').textContent =
+  secondsLeft;
 
-        /* 倒计时 */
-        .countdown {
-            font-size: 48px;
-            font-weight: 700;
-            background: var(--gradient-warm);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: var(--space-3) 0;
-        }
+                  if (secondsLeft <= 0) {
+                      clearInterval(countdownTimer);
+                      document.getElementById('skipButton').disabled =
+  false;
+                      document.getElementById('skipButton').textContent =
+  '查看我的测试结果 ✨';
+                  }
+              }, 1000);
+          }
 
-        .countdown-label {
-            font-size: 14px;
-            color: var(--gray-600);
-        }
-    </style>
-</head>
-<body>
-    <div class="wave-decoration"></div>
+          // 跳过分享，直接查看结果
+          function skipShare() {
+              localStorage.setItem('emotion_test_shared', 'true');
+              viewResult();
+          }
 
-    <div class="share-container">
-        <div class="success-icon">🎉</div>
-
-        <div class="share-card fade-in">
-            <h1 class="share-title">测试已完成！</h1>
-            <p class="share-subtitle">
-                你的情绪颗粒度报告已生成<br>
-                分享给好友即可解锁完整结果
-            </p>
-
-            <!-- 预览统计 -->
-            <div class="stats-preview">
-                <div class="stat-box">
-                    <div class="stat-icon">📊</div>
-                    <div class="stat-text">个性化雷达图</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-icon">🎯</div>
-                    <div class="stat-text">专属提升建议</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-icon">🏆</div>
-                    <div class="stat-text">星级评定</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-icon">💎</div>
-                    <div class="stat-text">详细分析报告</div>
-                </div>
-            </div>
-
-            <!-- 分享带来的好处 -->
-            <div class="benefits">
-                <div class="benefit-item">✅ 解锁完整测试结果和雷达图</div>
-                <div class="benefit-item">✅ 获得个性化情绪提升建议</div>
-                <div class="benefit-item">✅ 与好友对比情绪颗粒度</div>
-                <div class="benefit-item">✅ 帮助更多人了解自己的情绪</div>
-            </div>
-
-            <!-- 解锁方式 -->
-            <div class="unlock-methods">
-                <div class="method-title">选择分享方式解锁结果</div>
-                <div class="share-buttons">
-                    <button class="share-button share-wechat" onclick="shareToWechat()">
-                        💬 分享给微信好友
-                    </button>
-                    <button class="share-button share-moments" onclick="shareToMoments()">
-                        🌟 分享到朋友圈
-                    </button>
-                    <button class="share-button share-link" onclick="copyLink()">
-                        🔗 复制分享链接
-                    </button>
-                </div>
-            </div>
-
-            <!-- 跳过按钮（倒计时后显示） -->
-            <div id="skipSection" style="display: none;">
-                <div class="countdown" id="countdown">5</div>
-                <div class="countdown-label">秒后可以跳过分享</div>
-                <button class="skip-button" id="skipButton" onclick="skipShare()" disabled>
-                    直接查看结果 (需等待 <span id="skipTime">5</span>s)
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script src="test-data.js"></script>
-    <script>
-        let countdownTimer;
-        let secondsLeft = 5;
-
-        // 页面加载时开始倒计时
-        document.addEventListener('DOMContentLoaded', function() {
-            // 检查是否已经分享过
-            const hasShared = localStorage.getItem('emotion_test_shared');
-
-            if (hasShared) {
-                // 如果已经分享过，直接跳转
-                viewResult();
-                return;
-            }
-
-            // 开始倒计时
-            startCountdown();
-        });
-
-        function startCountdown() {
-            document.getElementById('skipSection').style.display = 'block';
-
-            countdownTimer = setInterval(() => {
-                secondsLeft--;
-                document.getElementById('countdown').textContent = secondsLeft;
-                document.getElementById('skipTime').textContent = secondsLeft;
-
-                if (secondsLeft <= 0) {
-                    clearInterval(countdownTimer);
-                    document.getElementById('skipButton').disabled = false;
-                    document.getElementById('skipButton').textContent = '跳过分享，直接查看结果';
-                }
-            }, 1000);
-        }
-
-        // 分享到微信
-        function shareToWechat() {
-            // 这里需要接入微信 JSSDK
-            // wx.ready(function() {
-            //     wx.updateAppMessageShareData({
-            //         title: '我的情绪颗粒度测试结果',
-            //         desc: '2分钟了解你的情绪表达能力，快来测测看！',
-            //         link: window.location.origin + '/landing.html',
-            //         imgUrl: window.location.origin + '/share-image.jpg',
-            //         success: function() {
-            //             markAsShared();
-            //             viewResult();
-            //         }
-            //     });
-            // });
-
-            // 临时处理：直接标记为已分享
-            alert('微信分享功能需要配置 JSSDK\n\n点击确定查看结果');
-            markAsShared();
-            viewResult();
-        }
-
-        // 分享到朋友圈
-        function shareToMoments() {
-            // 这里需要接入微信 JSSDK
-            // wx.ready(function() {
-            //     wx.updateTimelineShareData({
-            //         title: '我的情绪颗粒度测试结果 - 快来测测你的！',
-            //         link: window.location.origin + '/landing.html',
-            //         imgUrl: window.location.origin + '/share-image.jpg',
-            //         success: function() {
-            //             markAsShared();
-            //             viewResult();
-            //         }
-            //     });
-            // });
-
-            // 临时处理：直接标记为已分享
-            alert('朋友圈分享功能需要配置 JSSDK\n\n点击确定查看结果');
-            markAsShared();
-            viewResult();
-        }
-
-        // 复制链接
-        function copyLink() {
-            const link = window.location.origin + '/landing.html';
-
-            // 创建临时文本框
-            const textarea = document.createElement('textarea');
-            textarea.value = link;
-            textarea.style.position = 'fixed';
-            textarea.style.opacity = '0';
-            document.body.appendChild(textarea);
-            textarea.select();
-
-            try {
-                document.execCommand('copy');
-                alert('分享链接已复制到剪贴板！\n\n' + link + '\n\n发送给好友即可解锁结果');
-                markAsShared();
-                viewResult();
-            } catch (err) {
-                alert('复制失败，请手动复制：\n\n' + link);
-            } finally {
-                document.body.removeChild(textarea);
-            }
-        }
-
-        // 跳过分享
-        function skipShare() {
-            if (secondsLeft > 0) return;
-
-            markAsShared();
-            viewResult();
-        }
-
-        // 标记为已分享
-        function markAsShared() {
-            localStorage.setItem('emotion_test_shared', 'true');
-        }
-
-        // 查看结果
-        function viewResult() {
-            // 计算结果
-            const answers = JSON.parse(localStorage.getItem('emotion_test_answers'));
-            if (!answers) {
-                alert('未找到测试数据，请重新测试');
-                window.location.href = 'landing.html';
-                return;
-            }
-
-            const result = calculateResult(answers);
-
-            // 保存结果到 localStorage
-            localStorage.setItem('emotion_test_result', JSON.stringify(result));
-
-            // 跳转到结果页
-            window.location.href = 'result.html';
-        }
-    </script>
-</body>
-</html>
+          // 查看结果
+          function viewResult() {
+              window.location.href = 'result.html';
+          }
+      </script>
+  </body>
+  </html>
