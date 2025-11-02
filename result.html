@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="我的情绪颗粒度测试结果 - 星火奇缘">
+    <title>我的情绪颗粒度测试结果</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        body {
+            padding-bottom: 80px;
+        }
+
+        .result-container {
+            max-width: 750px;
+            margin: 0 auto;
+            padding: var(--space-3);
+        }
+
+        .wave-decoration {
+            height: 180px;
+        }
+
+        .result-content {
+            position: relative;
+            z-index: 1;
+            padding-top: 120px;
+        }
+
+        /* 结果头部 */
+        .result-header {
+            text-align: center;
+            margin-bottom: var(--space-4);
+        }
+
+        .result-icon {
+            font-size: 72px;
+            margin-bottom: var(--space-2);
+            animation: iconEntrance 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes iconEntrance {
+            0% {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+        }
+
+        .result-title {
+            font-size: 26px;
+            font-weight: 700;
+            background: var(--gradient-warm);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-2);
+            line-height: 1.3;
+        }
+
+        .result-stars {
+            font-size: 32px;
+            color: var(--emotion-positive);
+            margin-bottom: var(--space-2);
+            animation: starShine 1.5s ease-in-out infinite;
+        }
+
+        @keyframes starShine {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.05);
+            }
+        }
+
+        .result-score {
+            font-size: 16px;
+            color: var(--gray-600);
+            margin-bottom: 4px;
+        }
+
+        .result-percentage {
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--gradient-warm);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* 雷达图卡片 */
+        .radar-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: var(--space-4);
+            margin-bottom: var(--space-3);
+            box-shadow: var(--shadow-md);
+        }
+
+        .radar-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-3);
+            text-align: center;
+        }
+
+        .radar-container {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            margin-bottom: var(--space-3);
+        }
+
+        #radarCanvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 数据条 */
+        .data-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--space-2);
+        }
+
+        .data-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .data-label {
+            flex: 0 0 90px;
+            font-size: 14px;
+            color: var(--gray-700);
+            font-weight: 500;
+        }
+
+        .data-bar {
+            flex: 1;
+            height: 10px;
+            background: var(--gray-200);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-right: var(--space-2);
+        }
+
+        .data-fill {
+            height: 100%;
+            background: var(--gradient-warm);
+            border-radius: 5px;
+            animation: barGrow 1s ease-out;
+        }
+
+        @keyframes barGrow {
+            from {
+                width: 0;
+            }
+        }
+
+        .data-value {
+            flex: 0 0 45px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--primary-500);
+            text-align: right;
+        }
+
+        /* 内容卡片 */
+        .content-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            margin-bottom: var(--space-3);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .content-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-2);
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+        }
+
+        .content-card-body {
+            font-size: 15px;
+            color: var(--gray-700);
+            line-height: 1.8;
+        }
+
+        /* CTA卡片 */
+        .cta-card {
+            background: linear-gradient(135deg, rgba(108, 124, 231, 0.08) 0%, rgba(171, 123, 247, 0.08) 100%);
+            border: 2px solid var(--primary-400);
+            border-radius: var(--radius-xl);
+            padding: var(--space-4);
+            margin: var(--space-4) 0;
+            text-align: center;
+        }
+
+        .cta-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-600);
+            margin-bottom: var(--space-3);
+        }
+
+        .qrcode-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: var(--space-3);
+        }
+
+        .qrcode-image {
+            width: 160px;
+            height: 160px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            background: white;
+            padding: 8px;
+        }
+
+        .cta-features {
+            text-align: left;
+            display: inline-block;
+            margin-bottom: var(--space-2);
+        }
+
+        .cta-feature {
+            font-size: 14px;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cta-hint {
+            font-size: 13px;
+            color: var(--gray-600);
+            margin-top: var(--space-2);
+        }
+
+        /* 底部操作栏 */
+        .bottom-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            padding: var(--space-2) var(--space-3);
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+            display: flex;
+            gap: var(--space-2);
+            z-index: 100;
+        }
+
+        .action-btn {
+            flex: 1;
+            height: 48px;
+            border-radius: var(--radius-xl);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: none;
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .action-btn-save {
+            background: linear-gradient(135deg, #51CF66 0%, #37B24D 100%);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .action-btn-test {
+            background: var(--gradient-warm);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: var(--space-5);
+            font-size: 16px;
+            color: var(--gray-600);
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% {
+                content: '.';
+            }
+            40% {
+                content: '..';
+            }
+            60%, 100% {
+                content: '...';
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wave-decoration"></div>
+
+    <div class="result-container">
+        <div class="result-content" id="app">
+            <div class="loading">正在加载结果</div>
+        </div>
+    </div>
+
+    <div class="bottom-actions">
+        <button class="action-btn action-btn-save" onclick="saveImage()">
+            💾 保存图片
+        </button>
+        <button class="action-btn action-btn-test" onclick="testAgain()">
+            🔄 我也要测
+        </button>
+    </div>
+
+    <script src="test-data.js"></script>
+    <script>
+        // 页面加载时渲染
+        window.addEventListener('DOMContentLoaded', () => {
+            loadAndRenderResult();
+        });
+
+        // 加载并渲染结果
+        function loadAndRenderResult() {
+            // 从 localStorage 获取结果
+            const resultStr = localStorage.getItem('emotion_test_result');
+
+            if (!resultStr) {
+                // 如果没有结果，检查是否有答案数据可以重新计算
+                const answersStr = localStorage.getItem('emotion_test_answers');
+
+                if (answersStr) {
+                    const answers = JSON.parse(answersStr);
+                    const result = calculateResult(answers);
+                    localStorage.setItem('emotion_test_result', JSON.stringify(result));
+                    renderResult(result);
+                } else {
+                    // 都没有，跳转回首页
+                    document.getElementById('app').innerHTML = `
+                        <div class="content-card" style="text-align: center; margin-top: 100px;">
+                            <div style="font-size: 48px; margin-bottom: 16px;">🤔</div>
+                            <div class="content-card-title" style="justify-content: center;">未找到测试结果</div>
+                            <div class="content-card-body" style="margin-bottom: 24px;">请先完成测试</div>
+                            <button class="btn-primary" onclick="window.location.href='landing.html'">
+                                开始测试 →
+                            </button>
+                        </div>
+                    `;
+                }
+            } else {
+                const result = JSON.parse(resultStr);
+                renderResult(result);
+            }
+        }
+
+        // 渲染结果页面
+        function renderResult(data) {
+            const app = document.getElementById('app');
+
+            const stars = '★'.repeat(data.stars) + '☆'.repeat(5 - data.stars);
+
+            app.innerHTML = `
+                <div class="result-header fade-in">
+                    <div class="result-icon">${data.icon}</div>
+                    <div class="result-title">${data.title}</div>
+                    <div class="result-stars">${stars}</div>
+                    <div class="result-score">总分：${data.score}/${data.maxScore}</div>
+                    <div class="result-percentage">击败了 ${data.percentage}% 的人</div>
+                </div>
+
+                <div class="radar-card fade-in">
+                    <div class="radar-card-title">📊 你的情绪模式</div>
+                    <div class="radar-container">
+                        <canvas id="radarCanvas"></canvas>
+                    </div>
+                    ${Object.entries(data.radarData).map(([key, value]) => `
+                        <div class="data-item">
+                            <div class="data-label">${key}</div>
+                            <div class="data-bar">
+                                <div class="data-fill" style="width: ${value}%"></div>
+                            </div>
+                            <div class="data-value">${value}%</div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="content-card fade-in">
+                    <div class="content-card-title">💎 你的特质</div>
+                    <div class="content-card-body">${data.description}</div>
+                </div>
+
+                <div class="content-card fade-in">
+                    <div class="content-card-title">💡 给你的建议</div>
+                    <div class="content-card-body">${data.advice}</div>
+                </div>
+
+                <div class="cta-card fade-in">
+                    <div class="cta-card-title">✨ 在「星火奇缘」小程序中</div>
+                    <div class="qrcode-container">
+                        <img src="./qrcode.jpg" alt="小程序码" class="qrcode-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect width=%22200%22 height=%22200%22 fill=%22%23F8F9FA%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%236C7CE7%22 font-size=%2216%22 font-weight=%22600%22%3E星火奇缘%3C/text%3E%3C/svg%3E'">
+                    </div>
+                    <div class="cta-features">
+                        <div class="cta-feature">✓ 记录你的情绪模式</div>
+                        <div class="cta-feature">✓ 发现更多关于自己的洞察</div>
+                        <div class="cta-feature">✓ 用65个情绪词精准表达</div>
+                        <div class="cta-feature">✓ 查看情绪趋势和分析</div>
+                    </div>
+                    <div class="cta-hint">长按识别小程序码</div>
+                </div>
+            `;
+
+            // 延迟绘制雷达图，确保canvas已挂载
+            setTimeout(() => {
+                drawRadarChart(data.radarData);
+            }, 100);
+        }
+
+        // 绘制雷达图
+        function drawRadarChart(data) {
+            const canvas = document.getElementById('radarCanvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+
+            // 设置canvas实际大小
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const radius = Math.min(centerX, centerY) * 0.68;
+
+            const dataPoints = Object.values(data);
+            const labels = Object.keys(data);
+            const numPoints = dataPoints.length;
+
+            // 绘制背景网格（3层）
+            ctx.strokeStyle = 'rgba(108, 124, 231, 0.2)';
+            ctx.lineWidth = 1.5;
+
+            for (let i = 1; i <= 3; i++) {
+                ctx.beginPath();
+                for (let j = 0; j < numPoints; j++) {
+                    const angle = (Math.PI * 2 / numPoints) * j - Math.PI / 2;
+                    const r = (radius / 3) * i;
+                    const x = centerX + r * Math.cos(angle);
+                    const y = centerY + r * Math.sin(angle);
+                    if (j === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+
+            // 绘制分割线
+            ctx.strokeStyle = 'rgba(108, 124, 231, 0.15)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < numPoints; i++) {
+                const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(
+                    centerX + radius * Math.cos(angle),
+                    centerY + radius * Math.sin(angle)
+                );
+                ctx.stroke();
+            }
+
+            // 绘制数据区域
+            ctx.fillStyle = 'rgba(108, 124, 231, 0.25)';
+            ctx.strokeStyle = '#6C7CE7';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+
+            dataPoints.forEach((value, i) => {
+                const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
+                const r = (radius * value) / 100;
+                const x = centerX + r * Math.cos(angle);
+                const y = centerY + r * Math.sin(angle);
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // 绘制数据点
+            ctx.fillStyle = '#6C7CE7';
+            dataPoints.forEach((value, i) => {
+                const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
+                const r = (radius * value) / 100;
+                const x = centerX + r * Math.cos(angle);
+                const y = centerY + r * Math.sin(angle);
+
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 外圈白边
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+
+            // 绘制标签
+            ctx.fillStyle = '#495057';
+            ctx.font = '600 13px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            labels.forEach((label, i) => {
+                const angle = (Math.PI * 2 / numPoints) * i - Math.PI / 2;
+                const r = radius + 35;
+                const x = centerX + r * Math.cos(angle);
+                const y = centerY + r * Math.sin(angle);
+
+                ctx.fillText(label, x, y);
+            });
+        }
+
+        // 保存图片
+        function saveImage() {
+            alert('保存图片功能说明：\n\n方案1：长按页面截图保存\n方案2：使用html2canvas库生成图片\n方案3：服务端生成分享图\n\n当前请使用长按截图保存！');
+        }
+
+        // 再测一次
+        function testAgain() {
+            // 清除之前的数据
+            localStorage.removeItem('emotion_test_answers');
+            localStorage.removeItem('emotion_test_result');
+            localStorage.removeItem('emotion_test_progress');
+            localStorage.removeItem('emotion_test_shared');
+
+            // 跳转到首页
+            window.location.href = 'landing.html';
+        }
+    </script>
+</body>
+</html>

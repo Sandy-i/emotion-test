@@ -1,0 +1,243 @@
+/* 情绪颗粒度测试 - 公共样式 */
+
+:root {
+  /* 主色调 */
+  --primary-500: #6C7CE7;
+  --primary-600: #5B6AD6;
+  --primary-400: #8A98F0;
+
+  /* 渐变色 */
+  --gradient-warm: linear-gradient(135deg, #6C7CE7 0%, #AB7BF7 100%);
+  --gradient-cool: linear-gradient(135deg, #6C7CE7 0%, #66BB6A 100%);
+  --gradient-sunset: linear-gradient(135deg, #FF8A65 0%, #FFB74D 100%);
+
+  /* 情绪导向颜色 */
+  --emotion-positive: #FFD700;
+  --emotion-negative: #9370DB;
+  --emotion-balanced: #32CD32;
+
+  /* 中性色 */
+  --gray-50: #F8F9FA;
+  --gray-100: #F1F3F5;
+  --gray-200: #E9ECEF;
+  --gray-300: #DEE2E6;
+  --gray-600: #6C757D;
+  --gray-800: #343A40;
+  --gray-900: #212529;
+
+  /* 间距系统 */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+
+  /* 圆角 */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+  /* 动画 */
+  --transition-base: 300ms ease-out;
+  --transition-slow: 500ms ease-out;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--gray-50);
+  color: var(--gray-900);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 100%;
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* 顶部装饰波浪 */
+.wave-decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  background: var(--gradient-warm);
+  overflow: hidden;
+  z-index: 0;
+}
+
+.wave-decoration::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 200%;
+  height: 100px;
+  background: var(--gray-50);
+  border-radius: 50%;
+  animation: wave 8s infinite ease-in-out;
+}
+
+@keyframes wave {
+  0%, 100% {
+    transform: translateX(-25%) translateY(0);
+  }
+  50% {
+    transform: translateX(-25%) translateY(-20px);
+  }
+}
+
+/* 按钮样式 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: var(--gradient-warm);
+  color: white;
+}
+
+.btn-primary:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--primary-500);
+  border: 2px solid var(--primary-500);
+}
+
+.btn-secondary:hover {
+  background: var(--primary-500);
+  color: white;
+}
+
+.btn-large {
+  padding: var(--space-3) var(--space-5);
+  font-size: 18px;
+  border-radius: var(--radius-xl);
+}
+
+/* 卡片样式 */
+.card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* 进度条 */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--gray-200);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--gradient-warm);
+  border-radius: 4px;
+  transition: width var(--transition-slow);
+}
+
+/* 标题样式 */
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gray-900);
+  line-height: 1.3;
+  margin-bottom: var(--space-2);
+}
+
+.subtitle {
+  font-size: 16px;
+  color: var(--gray-600);
+  line-height: 1.5;
+}
+
+/* 加载动画 */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 淡入动画 */
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .title {
+    font-size: 24px;
+  }
+
+  .btn-large {
+    padding: var(--space-2) var(--space-4);
+    font-size: 16px;
+  }
+}

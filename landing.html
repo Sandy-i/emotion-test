@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>你的情绪颗粒度有多细？</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        .landing-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: var(--gray-50);
+        }
+
+        .hero-section {
+            position: relative;
+            padding: var(--space-5) var(--space-3);
+            text-align: center;
+            margin-top: 80px;
+            z-index: 1;
+        }
+
+        .hero-icon {
+            font-size: 80px;
+            margin-bottom: var(--space-3);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .hero-title {
+            font-size: 32px;
+            font-weight: 800;
+            background: var(--gradient-warm);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-2);
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 16px;
+            color: var(--gray-600);
+            margin-bottom: var(--space-4);
+            line-height: 1.6;
+        }
+
+        .info-cards {
+            padding: 0 var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+
+        .info-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: var(--space-3);
+            margin-bottom: var(--space-2);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-2);
+            transition: all var(--transition-base);
+        }
+
+        .info-card:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .info-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .info-content h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .info-content p {
+            font-size: 14px;
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+
+        .example-section {
+            padding: var(--space-3);
+            background: white;
+            margin: var(--space-3);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .example-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-2);
+            text-align: center;
+        }
+
+        .example-item {
+            padding: var(--space-2);
+            margin-bottom: var(--space-2);
+            border-radius: var(--radius-md);
+            background: var(--gray-50);
+        }
+
+        .example-label {
+            font-size: 12px;
+            color: var(--gray-600);
+            margin-bottom: 4px;
+        }
+
+        .example-text {
+            font-size: 14px;
+            color: var(--gray-900);
+            line-height: 1.5;
+        }
+
+        .example-text.low {
+            color: var(--gray-600);
+        }
+
+        .example-text.high {
+            color: var(--primary-500);
+            font-weight: 500;
+        }
+
+        .stats-section {
+            display: flex;
+            gap: var(--space-2);
+            padding: 0 var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+
+        .stat-item {
+            flex: 1;
+            background: white;
+            border-radius: var(--radius-md);
+            padding: var(--space-2);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--gradient-warm);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray-600);
+            margin-top: 4px;
+        }
+
+        .cta-section {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: var(--space-3);
+            background: white;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .cta-button {
+            width: 100%;
+            padding: var(--space-3);
+            background: var(--gradient-warm);
+            color: white;
+            border: none;
+            border-radius: var(--radius-xl);
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-md);
+        }
+
+        .cta-button:active {
+            transform: scale(0.98);
+        }
+
+        .cta-info {
+            font-size: 12px;
+            color: var(--gray-600);
+            text-align: center;
+            margin-top: var(--space-1);
+        }
+
+        /* 添加底部内边距，避免被固定的CTA按钮遮挡 */
+        .content-spacer {
+            height: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div class="wave-decoration"></div>
+
+    <div class="landing-container">
+        <!-- Hero Section -->
+        <div class="hero-section fade-in">
+            <div class="hero-icon">🎭</div>
+            <h1 class="hero-title">你的情绪颗粒度<br>有多细？</h1>
+            <p class="hero-subtitle">
+                2分钟测试，了解你识别和表达情绪的能力<br>
+                发现情绪背后的真实自己
+            </p>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="stat-item">
+                <div class="stat-number">10</div>
+                <div class="stat-label">道精选场景</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">15</div>
+                <div class="stat-label">种结果类型</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">2</div>
+                <div class="stat-label">分钟完成</div>
+            </div>
+        </div>
+
+        <!-- Info Cards -->
+        <div class="info-cards">
+            <div class="info-card" style="animation-delay: 0.1s;">
+                <div class="info-icon">🧠</div>
+                <div class="info-content">
+                    <h3>什么是情绪颗粒度？</h3>
+                    <p>指的是你识别和区分细微情绪差异的能力。颗粒度越高，越能准确表达感受，而不只是"开心"或"不开心"。</p>
+                </div>
+            </div>
+
+            <div class="info-card" style="animation-delay: 0.2s;">
+                <div class="info-icon">💡</div>
+                <div class="info-content">
+                    <h3>为什么重要？</h3>
+                    <p>研究表明，情绪颗粒度高的人更善于情绪调节，心理韧性更强，人际关系更好，抑郁和焦虑程度更低。</p>
+                </div>
+            </div>
+
+            <div class="info-card" style="animation-delay: 0.3s;">
+                <div class="info-icon">📊</div>
+                <div class="info-content">
+                    <h3>你将获得什么？</h3>
+                    <p>个性化的情绪颗粒度分析报告，包括雷达图、优势分析和提升建议，帮助你更好地认识自己。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Example Section -->
+        <div class="example-section">
+            <div class="example-title">🔍 举个例子</div>
+            <div class="example-item">
+                <div class="example-label">❌ 低颗粒度表达</div>
+                <div class="example-text low">"今天心情不太好"</div>
+            </div>
+            <div class="example-item">
+                <div class="example-label">✅ 高颗粒度表达</div>
+                <div class="example-text high">"我因为项目延期感到焦虑，同时对自己的拖延感到失望和愧疚"</div>
+            </div>
+        </div>
+
+        <!-- Content Spacer -->
+        <div class="content-spacer"></div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <button class="cta-button" onclick="startTest()">
+                开始测试 →
+            </button>
+            <div class="cta-info">
+                完全免费 · 无需登录 · 立即查看结果
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function startTest() {
+            // 清除之前的测试数据
+            localStorage.removeItem('emotion_test_answers');
+            localStorage.removeItem('emotion_test_progress');
+
+            // 跳转到答题页面
+            window.location.href = 'question.html';
+        }
+
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.info-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('fade-in');
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

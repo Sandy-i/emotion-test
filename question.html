@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>情绪颗粒度测试</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        .question-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--gray-50);
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: var(--space-2) var(--space-3);
+            box-shadow: var(--shadow-sm);
+            z-index: 100;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-1);
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        .progress-number {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-500);
+        }
+
+        .main-content {
+            flex: 1;
+            padding-top: 80px;
+            padding-bottom: 40px;
+        }
+
+        .question-card {
+            background: white;
+            margin: var(--space-3);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4) var(--space-3);
+            box-shadow: var(--shadow-md);
+            min-height: 400px;
+        }
+
+        .question-number {
+            display: inline-block;
+            background: var(--gradient-warm);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: var(--space-2);
+        }
+
+        .question-category {
+            font-size: 12px;
+            color: var(--gray-600);
+            margin-bottom: var(--space-3);
+        }
+
+        .question-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: var(--gray-900);
+            font-weight: 500;
+            margin-bottom: var(--space-2);
+        }
+
+        .question-hint {
+            font-size: 13px;
+            color: var(--primary-500);
+            background: linear-gradient(135deg, rgba(108, 124, 231, 0.08) 0%, rgba(171, 123, 247, 0.08) 100%);
+            border-left: 3px solid var(--primary-500);
+            padding: var(--space-2);
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-3);
+            line-height: 1.5;
+        }
+
+        .question-hint strong {
+            color: var(--primary-600);
+            font-weight: 600;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .option-button {
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            padding: var(--space-3);
+            text-align: left;
+            font-size: 15px;
+            line-height: 1.5;
+            color: var(--gray-900);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-button:hover {
+            border-color: var(--primary-400);
+            background: var(--gray-50);
+        }
+
+        .option-button.selected {
+            border-color: var(--primary-500);
+            background: linear-gradient(135deg, rgba(108, 124, 231, 0.1) 0%, rgba(171, 123, 247, 0.1) 100%);
+            font-weight: 500;
+        }
+
+        .option-button::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--gradient-warm);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+
+        .option-button.selected::before {
+            opacity: 1;
+        }
+
+        .option-label {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            text-align: center;
+            line-height: 24px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: var(--space-1);
+            transition: all var(--transition-base);
+        }
+
+        .option-button.selected .option-label {
+            background: var(--primary-500);
+            color: white;
+        }
+
+        .navigation {
+            display: flex;
+            gap: var(--space-2);
+            margin-top: var(--space-3);
+            padding: 0 var(--space-3);
+        }
+
+        .nav-button {
+            flex: 1;
+            padding: var(--space-2);
+            border: 2px solid var(--primary-500);
+            background: white;
+            color: var(--primary-500);
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .nav-button.primary {
+            background: var(--gradient-warm);
+            color: white;
+            border: none;
+        }
+
+        .nav-button.primary:disabled {
+            background: var(--gray-300);
+        }
+
+        .nav-button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        /* 淡入淡出动画 */
+        .fade-out {
+            animation: fadeOut 0.3s ease-out;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+        }
+
+        .fade-in-right {
+            animation: fadeInRight 0.3s ease-out;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="question-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="progress-info">
+                <span class="progress-text">情绪颗粒度测试</span>
+                <span class="progress-number" id="progressText">1/10</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 10%"></div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="question-card fade-in-right" id="questionCard">
+                <span class="question-number" id="questionNumber">第 1 题</span>
+                <div class="question-category" id="questionCategory">家庭关系</div>
+                <div class="question-text" id="questionText">
+                    周末家庭聚餐时，父母又开始询问你的工作、收入和结婚计划。此刻你的感受最接近：
+                </div>
+
+                <div class="question-hint">
+                    💡 选择<strong>最接近</strong>你的感受 · 如果纠结，请选择你的<strong>第一反应</strong>
+                </div>
+
+                <div class="options-container" id="optionsContainer">
+                    <!-- Options will be inserted here by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="navigation">
+                <button class="nav-button" id="prevButton" onclick="previousQuestion()">
+                    ← 上一题
+                </button>
+                <button class="nav-button primary" id="nextButton" onclick="nextQuestion()" disabled>
+                    下一题 →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="test-data.js"></script>
+    <script>
+        let currentQuestionIndex = 0;
+        let answers = new Array(10).fill(null);
+
+        // 从 localStorage 恢复进度
+        function loadProgress() {
+            const saved = localStorage.getItem('emotion_test_answers');
+            const savedProgress = localStorage.getItem('emotion_test_progress');
+
+            if (saved) {
+                answers = JSON.parse(saved);
+            }
+
+            if (savedProgress) {
+                currentQuestionIndex = parseInt(savedProgress);
+            }
+        }
+
+        // 保存进度
+        function saveProgress() {
+            localStorage.setItem('emotion_test_answers', JSON.stringify(answers));
+            localStorage.setItem('emotion_test_progress', currentQuestionIndex.toString());
+        }
+
+        // 渲染当前问题
+        function renderQuestion() {
+            const question = TEST_DATA.mainQuestions[currentQuestionIndex];
+
+            // 更新进度
+            document.getElementById('progressText').textContent = `${currentQuestionIndex + 1}/10`;
+            document.getElementById('progressFill').style.width = `${(currentQuestionIndex + 1) * 10}%`;
+
+            // 更新问题信息
+            document.getElementById('questionNumber').textContent = `第 ${currentQuestionIndex + 1} 题`;
+            document.getElementById('questionCategory').textContent = `📍 ${question.category}`;
+            document.getElementById('questionText').textContent = question.scenario;
+
+            // 渲染选项
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionButton = document.createElement('button');
+                optionButton.className = 'option-button';
+
+                if (answers[currentQuestionIndex] === index) {
+                    optionButton.classList.add('selected');
+                }
+
+                const labels = ['A', 'B', 'C', 'D', 'E'];
+                optionButton.innerHTML = `
+                    <span class="option-label">${labels[index]}</span>
+                    ${option.text}
+                `;
+
+                optionButton.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionButton);
+            });
+
+            // 更新按钮状态
+            updateNavigationButtons();
+
+            // 添加淡入动画
+            const card = document.getElementById('questionCard');
+            card.classList.remove('fade-in-right');
+            void card.offsetWidth; // 触发重排
+            card.classList.add('fade-in-right');
+        }
+
+        // 选择选项
+        function selectOption(optionIndex) {
+            answers[currentQuestionIndex] = optionIndex;
+            saveProgress();
+
+            // 更新UI
+            const options = document.querySelectorAll('.option-button');
+            options.forEach((btn, index) => {
+                if (index === optionIndex) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+
+            updateNavigationButtons();
+
+            // 如果不是最后一题，800ms后自动跳转到下一题
+            if (currentQuestionIndex < 9) {
+                setTimeout(() => {
+                    nextQuestion();
+                }, 600);
+            }
+        }
+
+        // 更新导航按钮状态
+        function updateNavigationButtons() {
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+
+            // 上一题按钮
+            prevButton.disabled = currentQuestionIndex === 0;
+
+            // 下一题按钮
+            const hasAnswer = answers[currentQuestionIndex] !== null;
+            nextButton.disabled = !hasAnswer;
+
+            // 如果是最后一题，改变按钮文字
+            if (currentQuestionIndex === 9) {
+                nextButton.textContent = '查看结果 →';
+            } else {
+                nextButton.textContent = '下一题 →';
+            }
+        }
+
+        // 上一题
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                saveProgress();
+                renderQuestion();
+            }
+        }
+
+        // 下一题
+        function nextQuestion() {
+            if (answers[currentQuestionIndex] === null) {
+                return;
+            }
+
+            if (currentQuestionIndex < 9) {
+                currentQuestionIndex++;
+                saveProgress();
+                renderQuestion();
+            } else {
+                // 完成测试，跳转到分享解锁页
+                window.location.href = 'share-gate.html';
+            }
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProgress();
+            renderQuestion();
+        });
+
+        // 键盘导航支持
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft' && currentQuestionIndex > 0) {
+                previousQuestion();
+            } else if (e.key === 'ArrowRight' && answers[currentQuestionIndex] !== null) {
+                nextQuestion();
+            } else if (e.key >= '1' && e.key <= '5') {
+                const optionIndex = parseInt(e.key) - 1;
+                if (optionIndex < TEST_DATA.mainQuestions[currentQuestionIndex].options.length) {
+                    selectOption(optionIndex);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
