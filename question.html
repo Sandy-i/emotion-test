@@ -281,8 +281,15 @@
         </div>
     </div>
 
-    <script src="test-data.js"></script>
+    <script src="test-data-by-age.js"></script>
     <script>
+        // 根据年龄段获取题目
+        const ageGroup = localStorage.getItem('emotion_test_age_group') || '29-35';
+        const currentQuestions = TEST_DATA_BY_AGE[ageGroup];
+        if (!currentQuestions) {
+            alert('年龄段数据加载失败，请重新选择');
+            window.location.href = 'age-select.html';
+        }
         let currentQuestionIndex = 0;
         let answers = new Array(10).fill(null);
 
@@ -308,7 +315,7 @@
 
         // 渲染当前问题
         function renderQuestion() {
-            const question = TEST_DATA.mainQuestions[currentQuestionIndex];
+            const question = currentQuestions[currentQuestionIndex];
 
             // 更新进度
             document.getElementById('progressText').textContent = `${currentQuestionIndex + 1}/10`;
@@ -435,7 +442,7 @@
                 nextQuestion();
             } else if (e.key >= '1' && e.key <= '5') {
                 const optionIndex = parseInt(e.key) - 1;
-                if (optionIndex < TEST_DATA.mainQuestions[currentQuestionIndex].options.length) {
+                if (optionIndex < currentQuestions[currentQuestionIndex].options.length) {
                     selectOption(optionIndex);
                 }
             }

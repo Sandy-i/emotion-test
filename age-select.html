@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="选择你的年龄段 - 情绪颗粒度测试">
+    <title>选择年龄段 - 情绪颗粒度测试</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        .age-container {
+            max-width: 750px;
+            margin: 0 auto;
+            padding: var(--space-4);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .age-header {
+            text-align: center;
+            margin-bottom: var(--space-5);
+        }
+
+        .age-icon {
+            font-size: 64px;
+            margin-bottom: var(--space-3);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .age-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: var(--space-2);
+            line-height: 1.3;
+        }
+
+        .age-subtitle {
+            font-size: 16px;
+            color: var(--gray-600);
+            line-height: 1.6;
+        }
+
+        .age-options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .age-option {
+            background: white;
+            border: 2px solid var(--gray-300);
+            border-radius: var(--radius-xl);
+            padding: var(--space-4);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .age-option:hover {
+            border-color: var(--primary-400);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .age-option:active {
+            transform: translateY(0);
+        }
+
+        .age-option.selected {
+            border-color: var(--primary-500);
+            background: linear-gradient(135deg, rgba(108, 124, 231, 0.08) 0%, rgba(171, 123, 247, 0.08) 100%);
+        }
+
+        .age-option.selected::after {
+            content: '✓';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: var(--primary-500);
+            font-weight: bold;
+        }
+
+        .age-option-emoji {
+            font-size: 32px;
+            margin-bottom: var(--space-2);
+        }
+
+        .age-option-label {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-1);
+        }
+
+        .age-option-desc {
+            font-size: 14px;
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+
+        .age-footer {
+            margin-top: var(--space-5);
+            text-align: center;
+        }
+
+        .btn-continue {
+            width: 100%;
+            max-width: 400px;
+            height: 56px;
+            background: var(--gradient-warm);
+            color: white;
+            border: none;
+            border-radius: var(--radius-xl);
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-sm);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-continue:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-continue:not(:disabled):hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .btn-continue:not(:disabled):active {
+            transform: translateY(0);
+        }
+
+        .privacy-note {
+            margin-top: var(--space-3);
+            font-size: 13px;
+            color: var(--gray-500);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="wave-decoration"></div>
+
+    <div class="age-container">
+        <div class="age-header fade-in">
+            <div class="age-icon">🎯</div>
+            <h1 class="age-title">先了解一下你</h1>
+            <p class="age-subtitle">为你匹配最贴合的情绪场景<br>让测试结果更精准</p>
+        </div>
+
+        <div class="age-options fade-in">
+            <div class="age-option" data-age="18-22">
+                <div class="age-option-emoji">🎓</div>
+                <div class="age-option-label">18-22岁</div>
+                <div class="age-option-desc">大学生 / 应届生 / 初入社会</div>
+            </div>
+
+            <div class="age-option" data-age="23-28">
+                <div class="age-option-emoji">💼</div>
+                <div class="age-option-label">23-28岁</div>
+                <div class="age-option-desc">职场新人 / 探索期 / 自我建立</div>
+            </div>
+
+            <div class="age-option" data-age="29-35">
+                <div class="age-option-emoji">🎯</div>
+                <div class="age-option-label">29-35岁</div>
+                <div class="age-option-desc">职场发展期 / 成家立业 / 人生选择</div>
+            </div>
+
+            <div class="age-option" data-age="36-45">
+                <div class="age-option-emoji">🌳</div>
+                <div class="age-option-label">36-45岁</div>
+                <div class="age-option-desc">中坚力量 / 上有老下有小 / 多重角色</div>
+            </div>
+
+            <div class="age-option" data-age="46+">
+                <div class="age-option-emoji">🧘</div>
+                <div class="age-option-label">46岁以上</div>
+                <div class="age-option-desc">人生阅历丰富 / 追求平衡与智慧</div>
+            </div>
+        </div>
+
+        <div class="age-footer fade-in">
+            <button class="btn-continue" id="btnContinue" disabled>
+                开始测试 →
+            </button>
+            <p class="privacy-note">你的选择仅用于个性化测试，不会被分享</p>
+        </div>
+    </div>
+
+    <script>
+        let selectedAge = null;
+
+        // 年龄选项点击事件
+        document.querySelectorAll('.age-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // 移除所有选中状态
+                document.querySelectorAll('.age-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+
+                // 添加当前选中状态
+                this.classList.add('selected');
+                selectedAge = this.dataset.age;
+
+                // 启用继续按钮
+                document.getElementById('btnContinue').disabled = false;
+            });
+        });
+
+        // 继续按钮点击事件
+        document.getElementById('btnContinue').addEventListener('click', function() {
+            if (selectedAge) {
+                // 保存年龄段到 localStorage
+                localStorage.setItem('emotion_test_age_group', selectedAge);
+
+                // 跳转到测试页面
+                window.location.href = 'question.html';
+            }
+        });
+    </script>
+</body>
+</html>

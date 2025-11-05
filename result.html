@@ -337,7 +337,9 @@
         </button>
     </div>
 
-    <script src="test-data.js"></script>
+    <!-- html2canvas 库用于生成截图 -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="test-data-by-age.js"></script>
     <script>
         // 页面加载时渲染
         window.addEventListener('DOMContentLoaded', () => {
@@ -355,7 +357,8 @@
 
                 if (answersStr) {
                     const answers = JSON.parse(answersStr);
-                    const result = calculateResult(answers);
+                    const ageGroup = localStorage.getItem('emotion_test_age_group') || '29-35';
+                    const result = calculateResult(answers, ageGroup);
                     localStorage.setItem('emotion_test_result', JSON.stringify(result));
                     renderResult(result);
                 } else {
@@ -553,8 +556,62 @@
         }
 
         // 保存图片
-        function saveImage() {
-            alert('保存图片功能说明：\n\n长按页面截图保存');
+        async function saveImage() {
+            const button = event.target;
+
+            // 检查html2canvas是否加载
+            if (typeof html2canvas === 'undefined') {
+                alert('截图库加载失败，请刷新页面重试');
+                return;
+            }
+
+            try {
+                // 显示加载状态
+                button.disabled = true;
+                button.textContent = '生成中...';
+
+                // 获取要截图的元素
+                const element = document.getElementById('app');
+
+                // 配置选项
+                const options = {
+                    backgroundColor: '#f8f9fa',
+                    scale: 2, // 提高清晰度
+                    useCORS: true, // 允许跨域图片
+                    logging: false,
+                    width: element.scrollWidth,
+                    height: element.scrollHeight,
+                    windowWidth: element.scrollWidth,
+                    windowHeight: element.scrollHeight
+                };
+
+                // 生成截图
+                const canvas = await html2canvas(element, options);
+
+                // 转换为blob并下载
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = `情绪颗粒度测试结果_$' + '{new Date().getTime()}' + '.png`;
+                    link.href = url;
+                    link.click();
+
+                    // 清理
+                    URL.revokeObjectURL(url);
+
+                    // 恢复按钮状态
+                    button.disabled = false;
+                    button.innerHTML = '💾 保存图片';
+                }, 'image/png', 1.0);
+
+            } catch (error) {
+                console.error('截图失败:', error);
+                alert('截图失败，请重试或使用长按截图方式保存');
+
+                // 恢复按钮状态
+                button.disabled = false;
+                button.innerHTML = '💾 保存图片';
+            }
         }
 
         // 再测一次
