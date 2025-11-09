@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>正在生成结果 - 情绪颗粒度测试</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        .share-gate-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .share-gate-content {
+            background: white;
+            border-radius: 24px;
+            padding: 48px 32px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .gate-icon {
+            font-size: 80px;
+            margin-bottom: 24px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .gate-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .gate-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .benefits {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            text-align: left;
+        }
+
+        .benefit-item {
+            padding: 12px 0;
+            color: var(--text-primary);
+            font-size: 15px;
+            line-height: 1.6;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .benefit-item:last-child {
+            border-bottom: none;
+        }
+
+        .countdown {
+            font-size: 64px;
+            font-weight: 700;
+            background: var(--gradient-warm);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .countdown-label {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .skip-button {
+            width: 100%;
+            padding: 16px 32px;
+            background: var(--gradient-warm);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(108, 124, 231, 0.3);
+        }
+
+        .skip-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .skip-button:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 124, 231, 0.4);
+        }
+
+        .skip-button:not(:disabled):active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="share-gate-container">
+        <div class="share-gate-content">
+            <div class="gate-icon">🎉</div>
+            <div class="gate-title">测试完成！</div>
+            <div class="gate-subtitle">
+                你已经完成了10道题的测试<br>
+                正在为你生成个性化结果...
+            </div>
+
+            <!-- 分享带来的好处 -->
+            <div class="benefits">
+                <div class="benefit-item">✅ 解锁完整测试结果和雷达图</div>
+                <div class="benefit-item">✅ 获得个性化情绪提升建议</div>
+                <div class="benefit-item">✅ 了解你的情绪表达特点</div>
+                <div class="benefit-item">✅ 查看详细的情绪分析报告</div>
+            </div>
+
+            <!-- 倒计时查看结果 -->
+            <div id="skipSection">
+                <div class="countdown" id="countdown">5</div>
+                <div class="countdown-label">秒后可以查看结果</div>
+                <button class="skip-button" id="skipButton" onclick="skipShare()" disabled>
+                    查看我的测试结果 (<span id="skipTime">5</span>秒)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="test-data.js"></script>
+    <script>
+        let countdownTimer;
+        let secondsLeft = 5;
+
+        // 页面加载时开始倒计时
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查是否已经分享过
+            const hasShared = localStorage.getItem('emotion_test_shared');
+
+            if (hasShared) {
+                // 如果已经分享过，直接跳转
+                viewResult();
+                return;
+            }
+
+            // 开始倒计时
+            startCountdown();
+        });
+
+        function startCountdown() {
+            countdownTimer = setInterval(() => {
+                secondsLeft--;
+                document.getElementById('countdown').textContent = secondsLeft;
+                document.getElementById('skipTime').textContent = secondsLeft;
+
+                if (secondsLeft <= 0) {
+                    clearInterval(countdownTimer);
+                    document.getElementById('skipButton').disabled = false;
+                    document.getElementById('skipButton').textContent = '正在跳转...';
+                    // 自动跳转到结果页
+                    skipShare();
+                }
+            }, 1000);
+        }
+
+        // 跳过分享，直接查看结果
+        function skipShare() {
+            localStorage.setItem('emotion_test_shared', 'true');
+            viewResult();
+        }
+
+        // 查看结果
+        function viewResult() {
+            window.location.href = 'result.html';
+        }
+    </script>
+</body>
+</html>

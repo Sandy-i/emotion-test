@@ -423,8 +423,10 @@
                 saveProgress();
                 renderQuestion();
             } else {
-                // 完成测试，跳转到分享解锁页
-                window.location.href = 'share-gate.html';
+                // 完成测试，计算结果并跳转到结果页
+                const result = calculateResult(answers, ageGroup);
+                localStorage.setItem('emotion_test_result', JSON.stringify(result));
+                window.location.href = 'share-gate-简化版.html';
             }
         }
 
