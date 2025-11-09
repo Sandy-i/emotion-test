@@ -575,7 +575,7 @@
 
                 // 配置选项
                 const options = {
-                    backgroundColor: '#f8f9fa',
+                    backgroundColor: '#ffffff', // 纯白背景
                     scale: 2, // 提高清晰度
                     useCORS: true, // 允许跨域图片
                     logging: false,
@@ -592,7 +592,7 @@
                 canvas.toBlob((blob) => {
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
-                    link.download = `情绪颗粒度测试结果_$' + '{new Date().getTime()}' + '.png`;
+                    link.download = `情绪颗粒度测试结果_${new Date().getTime()}.png`;
                     link.href = url;
                     link.click();
 
