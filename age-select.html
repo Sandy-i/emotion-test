@@ -6,7 +6,43 @@
     <meta name="description" content="选择你的年龄段 - 情绪颗粒度测试">
     <title>选择年龄段 - 情绪颗粒度测试</title>
     <link rel="stylesheet" href="common.css">
+    <script src="i18n.js"></script>
     <style>
+        /* 语言切换器 */
+        .lang-switcher {
+            position: fixed;
+            top: var(--space-2);
+            right: var(--space-3);
+            z-index: 1000;
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .lang-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            color: var(--gray-600);
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .lang-btn:hover {
+            background: var(--gray-100);
+        }
+
+        .lang-btn.active {
+            background: var(--gradient-warm);
+            color: white;
+        }
+
         .age-container {
             max-width: 750px;
             margin: 0 auto;
@@ -161,55 +197,110 @@
 </head>
 <body>
     <div class="wave-decoration"></div>
+    <!-- 语言切换器 -->
+    <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="zh-CN" onclick="switchLanguage('zh-CN')">中文</button>
+        <button class="lang-btn" data-lang="en-US" onclick="switchLanguage('en-US')">EN</button>
+    </div>
+
 
     <div class="age-container">
         <div class="age-header fade-in">
             <div class="age-icon">🎯</div>
-            <h1 class="age-title">先了解一下你</h1>
-            <p class="age-subtitle">为你匹配最贴合的情绪场景<br>让测试结果更精准</p>
+            <h1 class="age-title" data-i18n="ageSelect.title"></h1>
+            <p class="age-subtitle" data-i18n="ageSelect.subtitle"></p>
         </div>
 
         <div class="age-options fade-in">
             <div class="age-option" data-age="18-22">
                 <div class="age-option-emoji">🎓</div>
-                <div class="age-option-label">18-22岁</div>
-                <div class="age-option-desc">大学生 / 应届生 / 初入社会</div>
+                <div class="age-option-label" data-i18n="ageSelect.age1"></div>
+                <div class="age-option-desc" data-i18n="ageSelect.age1desc"></div>
             </div>
 
             <div class="age-option" data-age="23-28">
                 <div class="age-option-emoji">💼</div>
-                <div class="age-option-label">23-28岁</div>
-                <div class="age-option-desc">职场新人 / 探索期 / 自我建立</div>
+                <div class="age-option-label" data-i18n="ageSelect.age2"></div>
+                <div class="age-option-desc" data-i18n="ageSelect.age2desc"></div>
             </div>
 
             <div class="age-option" data-age="29-35">
                 <div class="age-option-emoji">🎯</div>
-                <div class="age-option-label">29-35岁</div>
-                <div class="age-option-desc">职场发展期 / 成家立业 / 人生选择</div>
+                <div class="age-option-label" data-i18n="ageSelect.age3"></div>
+                <div class="age-option-desc" data-i18n="ageSelect.age3desc"></div>
             </div>
 
             <div class="age-option" data-age="36-45">
                 <div class="age-option-emoji">🌳</div>
-                <div class="age-option-label">36-45岁</div>
-                <div class="age-option-desc">中坚力量 / 上有老下有小 / 多重角色</div>
+                <div class="age-option-label" data-i18n="ageSelect.age4"></div>
+                <div class="age-option-desc" data-i18n="ageSelect.age4desc"></div>
             </div>
 
             <div class="age-option" data-age="46+">
                 <div class="age-option-emoji">🧘</div>
-                <div class="age-option-label">46岁以上</div>
-                <div class="age-option-desc">人生阅历丰富 / 追求平衡与智慧</div>
+                <div class="age-option-label" data-i18n="ageSelect.age5"></div>
+                <div class="age-option-desc" data-i18n="ageSelect.age5desc"></div>
             </div>
         </div>
 
         <div class="age-footer fade-in">
             <button class="btn-continue" id="btnContinue" disabled>
-                开始测试 →
+                <span data-i18n="landing.ctaButton"></span>
             </button>
-            <p class="privacy-note">你的选择仅用于个性化测试，不会被分享</p>
+            <p class="privacy-note" data-i18n="ageSelect.privacyNote"></p>
         </div>
     </div>
 
     <script>
+        // 语言切换和更新
+        function switchLanguage(lang) {
+            i18n.setLang(lang);
+            updateLanguage();
+
+            // 更新按钮状态
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if (btn.dataset.lang === lang) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        function updateLanguage() {
+            // 更新页面标题
+            document.title = i18n.t('ageSelect.title') + ' - ' + i18n.t('landing.title').replace(/\n/g, ' ');
+
+            // 更新所有带 data-i18n 属性的元素
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                const text = i18n.t(key);
+
+                // 处理包含 <br> 的文本
+                if (text.includes('\n')) {
+                    element.innerHTML = text.replace(/\n/g, '<br>');
+                } else {
+                    element.textContent = text;
+                }
+            });
+        }
+
+        // 页面加载时初始化语言
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLanguage();
+
+            // 更新语言按钮状态
+            const currentLang = i18n.getLang();
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if (btn.dataset.lang === currentLang) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        });
+
+
         let selectedAge = null;
 
         // 年龄选项点击事件

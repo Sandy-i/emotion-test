@@ -320,23 +320,35 @@
     </style>
 </head>
 <body>
+    <!-- 语言切换器 -->
+    <div class="lang-switcher" style="position: fixed; top: 16px; right: 24px; z-index: 1000; background: white; border-radius: 24px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12); display: flex; padding: 4px; gap: 4px;">
+        <button class="lang-btn active" data-lang="zh-CN" onclick="switchLanguage('zh-CN')" style="padding: 6px 12px; border: none; background: transparent; color: #6C757D; font-size: 14px; font-weight: 500; border-radius: 12px; cursor: pointer; transition: all 300ms ease-out;">中文</button>
+        <button class="lang-btn" data-lang="en-US" onclick="switchLanguage('en-US')" style="padding: 6px 12px; border: none; background: transparent; color: #6C757D; font-size: 14px; font-weight: 500; border-radius: 12px; cursor: pointer; transition: all 300ms ease-out;">EN</button>
+    </div>
+    <style>
+        .lang-btn:hover { background: #F1F3F5 !important; }
+        .lang-btn.active { background: linear-gradient(135deg, #6C7CE7 0%, #AB7BF7 100%) !important; color: white !important; }
+    </style>
+
     <div class="wave-decoration"></div>
 
     <div class="result-container">
         <div class="result-content" id="app">
-            <div class="loading">正在加载结果</div>
+            <div class="loading" data-i18n="result.loading"></div>
         </div>
     </div>
 
     <div class="bottom-actions">
         <button class="action-btn action-btn-save" onclick="saveImage()">
-            💾 保存图片
+            <span data-i18n-icon="💾">💾</span> <span data-i18n="result.saveButton"></span>
         </button>
         <button class="action-btn action-btn-test" onclick="testAgain()">
-            🔄 我也要测
+            <span data-i18n-icon="🔄">🔄</span> <span data-i18n="result.retestButton"></span>
         </button>
     </div>
 
+    <!-- i18n 多语言支持 -->
+    <script src="i18n.js"></script>
     <!-- html2canvas 库用于生成截图 -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="test-data-by-age.js"></script>
@@ -344,6 +356,16 @@
         // 页面加载时渲染
         window.addEventListener('DOMContentLoaded', () => {
             loadAndRenderResult();
+
+            // 初始化语言按钮状态
+            const currentLang = i18n.getLang();
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if (btn.dataset.lang === currentLang) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
         });
 
         // 加载并渲染结果
@@ -366,13 +388,14 @@
                     document.getElementById('app').innerHTML = `
                         <div class="content-card" style="text-align: center; margin-top: 100px;">
                             <div style="font-size: 48px; margin-bottom: 16px;">🤔</div>
-                            <div class="content-card-title" style="justify-content: center;">未找到测试结果</div>
-                            <div class="content-card-body" style="margin-bottom: 24px;">请先完成测试</div>
+                            <div class="content-card-title" style="justify-content: center;" data-i18n="result.notFoundTitle"></div>
+                            <div class="content-card-body" style="margin-bottom: 24px;" data-i18n="result.notFoundDesc"></div>
                             <button class="btn-primary" onclick="window.location.href='landing.html'">
-                                开始测试 →
+                                <span data-i18n="result.startButton"></span>
                             </button>
                         </div>
                     `;
+                    updateLanguage();
                 }
             } else {
                 const result = JSON.parse(resultStr);
@@ -391,12 +414,13 @@
                     <div class="result-icon">${data.icon}</div>
                     <div class="result-title">${data.title}</div>
                     <div class="result-stars">${stars}</div>
-                    <div class="result-score">总分：${data.score}/${data.maxScore}</div>
-                    <div class="result-percentage">击败了 ${data.percentage}% 的人</div>
+                    <div class="result-score" data-i18n="result.scoreLabel"></div>
+                    <div class="result-score-value">${data.score}/${data.maxScore}</div>
+                    <div class="result-percentage"><span data-i18n="result.beatLabel"></span> ${data.percentage}% <span data-i18n="result.beatSuffix"></span></div>
                 </div>
 
                 <div class="radar-card fade-in">
-                    <div class="radar-card-title">📊 你的情绪模式</div>
+                    <div class="radar-card-title">📊 <span data-i18n="result.radarTitle"></span></div>
                     <div class="radar-container">
                         <canvas id="radarCanvas"></canvas>
                     </div>
@@ -412,34 +436,71 @@
                 </div>
 
                 <div class="content-card fade-in">
-                    <div class="content-card-title">💎 你的特质</div>
+                    <div class="content-card-title">💎 <span data-i18n="result.traitsTitle"></span></div>
                     <div class="content-card-body">${data.description}</div>
                 </div>
 
                 <div class="content-card fade-in">
-                    <div class="content-card-title">💡 给你的建议</div>
+                    <div class="content-card-title">💡 <span data-i18n="result.adviceTitle"></span></div>
                     <div class="content-card-body">${data.advice}</div>
                 </div>
 
                 <div class="cta-card fade-in">
-                    <div class="cta-card-title">✨ 在「星火奇缘」小程序中</div>
+                    <div class="cta-card-title">✨ <span data-i18n="result.ctaTitle"></span></div>
                     <div class="qrcode-container">
                         <img src="./qrcode.jpg" alt="小程序码" class="qrcode-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect width=%22200%22 height=%22200%22 fill=%22%23F8F9FA%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%236C7CE7%22 font-size=%2216%22 font-weight=%22600%22%3E星火奇缘%3C/text%3E%3C/svg%3E'">
                     </div>
                     <div class="cta-features">
-                        <div class="cta-feature">✓ 记录你的情绪模式</div>
-                        <div class="cta-feature">✓ 发现更多关于自己的洞察</div>
-                        <div class="cta-feature">✓ 用65个情绪词精准表达</div>
-                        <div class="cta-feature">✓ 查看情绪趋势和分析</div>
+                        <div class="cta-feature">✓ <span data-i18n="result.feature1"></span></div>
+                        <div class="cta-feature">✓ <span data-i18n="result.feature2"></span></div>
+                        <div class="cta-feature">✓ <span data-i18n="result.feature3"></span></div>
+                        <div class="cta-feature">✓ <span data-i18n="result.feature4"></span></div>
                     </div>
-                    <div class="cta-hint">长按识别小程序码</div>
+                    <div class="cta-hint" data-i18n="result.ctaHint"></div>
                 </div>
             `;
 
             // 延迟绘制雷达图，确保canvas已挂载
             setTimeout(() => {
                 drawRadarChart(data.radarData);
+                updateLanguage(); // 更新语言
             }, 100);
+        }
+
+
+        // 语言切换和更新
+        function switchLanguage(lang) {
+            i18n.setLang(lang);
+            updateLanguage();
+
+            // 更新按钮状态
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if (btn.dataset.lang === lang) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        function updateLanguage() {
+            // 更新页面标题
+            document.title = i18n.t('result.loading') + ' - ' + i18n.t('landing.title').replace(/\n/g, ' ');
+
+            // 更新所有带 data-i18n 属性的元素
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                let text = i18n.t(key);
+
+                // 处理特殊格式
+                if (key === 'result.scoreLabel') {
+                    element.textContent = text + '：';
+                } else if (key === 'result.beatSuffix') {
+                    element.textContent = text;
+                } else {
+                    element.textContent = text;
+                }
+            });
         }
 
         // 绘制雷达图
@@ -572,6 +633,7 @@
 
                 // 获取要截图的元素
                 const element = document.getElementById('app');
+                const resultContent = document.querySelector('.result-content');
 
                 // 隐藏波浪装饰，避免截图时出现白色覆盖层
                 const waveDecoration = document.querySelector('.wave-decoration');
@@ -580,9 +642,17 @@
                     waveDecoration.style.display = 'none';
                 }
 
-                // 给截图元素临时添加背景，确保截图清晰
+                // 移除result-content的padding-top，避免顶部空白
+                const originalPaddingTop = resultContent ? resultContent.style.paddingTop : '';
+                if (resultContent) {
+                    resultContent.style.paddingTop = '0';
+                }
+
+                // 给截图元素临时添加背景和内边距，确保截图美观
                 const originalBg = element.style.backgroundColor;
+                const originalPadding = element.style.padding;
                 element.style.backgroundColor = '#F8F9FA';
+                element.style.padding = '32px 24px';
 
                 // 配置选项
                 const options = {
@@ -608,7 +678,11 @@
                 if (waveDecoration) {
                     waveDecoration.style.display = originalWaveDisplay;
                 }
+                if (resultContent) {
+                    resultContent.style.paddingTop = originalPaddingTop;
+                }
                 element.style.backgroundColor = originalBg;
+                element.style.padding = originalPadding;
 
                 // 转换为blob并下载
                 canvas.toBlob((blob) => {
@@ -623,7 +697,7 @@
 
                     // 恢复按钮状态
                     button.disabled = false;
-                    button.innerHTML = '💾 保存图片';
+                    button.innerHTML = '<span data-i18n-icon="💾">💾</span> <span data-i18n="result.saveButton"></span>';
                 }, 'image/png', 1.0);
 
             } catch (error) {
@@ -632,16 +706,21 @@
 
                 // 恢复按钮状态
                 button.disabled = false;
-                button.innerHTML = '💾 保存图片';
+                button.innerHTML = '<span data-i18n-icon="💾">💾</span> <span data-i18n="result.saveButton"></span>';
 
                 // 确保恢复原始样式
                 const waveDecoration = document.querySelector('.wave-decoration');
                 if (waveDecoration) {
                     waveDecoration.style.display = '';
                 }
+                const resultContent = document.querySelector('.result-content');
+                if (resultContent) {
+                    resultContent.style.paddingTop = '';
+                }
                 const element = document.getElementById('app');
                 if (element) {
                     element.style.backgroundColor = '';
+                    element.style.padding = '';
                 }
             }
         }

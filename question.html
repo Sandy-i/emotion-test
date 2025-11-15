@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>情绪颗粒度测试</title>
     <link rel="stylesheet" href="common.css">
+    <script src="i18n.js"></script>
     <style>
         .question-container {
             min-height: 100vh;
@@ -239,6 +240,16 @@
     </style>
 </head>
 <body>
+    <!-- 语言切换器 -->
+    <div class="lang-switcher" style="position: fixed; top: 16px; right: 24px; z-index: 1000; background: white; border-radius: 24px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12); display: flex; padding: 4px; gap: 4px;">
+        <button class="lang-btn active" data-lang="zh-CN" onclick="switchLanguage('zh-CN')" style="padding: 6px 12px; border: none; background: transparent; color: #6C757D; font-size: 14px; font-weight: 500; border-radius: 12px; cursor: pointer; transition: all 300ms ease-out;">中文</button>
+        <button class="lang-btn" data-lang="en-US" onclick="switchLanguage('en-US')" style="padding: 6px 12px; border: none; background: transparent; color: #6C757D; font-size: 14px; font-weight: 500; border-radius: 12px; cursor: pointer; transition: all 300ms ease-out;">EN</button>
+    </div>
+    <style>
+        .lang-btn:hover { background: #F1F3F5 !important; }
+        .lang-btn.active { background: linear-gradient(135deg, #6C7CE7 0%, #AB7BF7 100%) !important; color: white !important; }
+    </style>
+
     <div class="question-container">
         <!-- Header -->
         <div class="header">
@@ -272,20 +283,118 @@
             <!-- Navigation -->
             <div class="navigation">
                 <button class="nav-button" id="prevButton" onclick="previousQuestion()">
-                    ← 上一题
+                    <span data-i18n="question.prevButton"></span>
                 </button>
                 <button class="nav-button primary" id="nextButton" onclick="nextQuestion()" disabled>
-                    下一题 →
+                    <span data-i18n="question.nextButton"></span>
                 </button>
             </div>
         </div>
     </div>
 
     <script src="test-data-by-age.js"></script>
+    <script src="test-data-i18n.js"></script>
     <script>
+        // 语言切换和更新
+        function switchLanguage(lang) {
+            i18n.setLang(lang);
+            updateLanguage();
+
+            // 更新按钮状态
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if (btn.dataset.lang === lang) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        function updateLanguage() {
+            // 更新页面标题
+            document.title = i18n.t('landing.title').replace(/\n/g, ' ');
+
+            // 更新进度文本
+            const progressText = document.querySelector('.progress-text');
+            if (progressText && !progressText.textContent.includes('/')) {
+                progressText.textContent = i18n.t('question.progressText');
+            }
+
+            // 更新提示文本
+            const hintElements = document.querySelectorAll('.question-hint');
+            hintElements.forEach(hint => {
+                if (hint.textContent.includes('选择') || hint.textContent.includes('Choose')) {
+                    hint.innerHTML = `${i18n.t('question.hint')} <strong>${i18n.t('question.hintBold')}</strong> ${i18n.t('question.hintSuffix')}`;
+                }
+            });
+
+            // 更新所有带 data-i18n 属性的元素
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                element.textContent = i18n.t(key);
+            });
+        }
+
+        
+        // ==================== 类别翻译支持 ====================
+        const CATEGORY_TRANSLATIONS = {
+            '学业压力': 'Academic Pressure',
+            '宿舍关系': 'Dorm Relationships',
+            '恋爱关系': 'Romantic Relationships',
+            '求职/未来': 'Job Hunting/Future',
+            '家庭经济': 'Family Finances',
+            '社交对比': 'Social Comparison',
+            '学业/专业': 'Studies/Major',
+            '社团/集体活动': 'Club/Group Activities',
+            '独立生活': 'Independent Living',
+            '自我认知': 'Self-awareness',
+            '职场压力': 'Workplace Pressure',
+            '团队合作': 'Teamwork',
+            '职业发展': 'Career Development',
+            '财务管理': 'Financial Management',
+            '亲密关系': 'Intimate Relationships',
+            '工作与生活平衡': 'Work-Life Balance',
+            '人际关系': 'Interpersonal Relationships',
+            '家庭责任': 'Family Responsibilities',
+            '健康焦虑': 'Health Anxiety',
+            '子女教育': 'Children Education',
+            '婚姻关系': 'Marriage',
+            '养老焦虑': 'Retirement Anxiety',
+            '身体健康': 'Physical Health',
+            '人生意义': 'Life Meaning',
+            '职场晋升': 'Career Advancement',
+            '事业与家庭': 'Career vs Family'
+        };
+
+        // 获取翻译后的类别名称
+        function getTranslatedCategory(category) {
+            const currentLang = i18n.getLang();
+            if (currentLang === 'en-US') {
+                return CATEGORY_TRANSLATIONS[category] || category;
+            }
+            return category;
+        }
+
+
+        // 页面加载时初始化语言
+        window.addEventListener('load', function() {
+            updateLanguage();
+
+            // 初始化语言按钮状态
+            const currentLang = i18n.getLang();
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if (btn.dataset.lang === currentLang) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        });
+
+
         // 根据年龄段获取题目
         const ageGroup = localStorage.getItem('emotion_test_age_group') || '29-35';
-        const currentQuestions = TEST_DATA_BY_AGE[ageGroup];
+        const currentQuestions = getLocalizedQuestions(ageGroup, i18n.getLang());
         if (!currentQuestions) {
             alert('年龄段数据加载失败，请重新选择');
             window.location.href = 'age-select.html';
@@ -397,9 +506,9 @@
 
             // 如果是最后一题，改变按钮文字
             if (currentQuestionIndex === 9) {
-                nextButton.textContent = '查看结果 →';
+                nextButton.textContent = '<span data-i18n="question.submitButton"></span>';
             } else {
-                nextButton.textContent = '下一题 →';
+                nextButton.textContent = '<span data-i18n="question.nextButton"></span>';
             }
         }
 
