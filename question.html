@@ -298,7 +298,15 @@
         // 语言切换和更新
         function switchLanguage(lang) {
             i18n.setLang(lang);
+
+            // 重新获取本地化的问题数据
+            const ageGroup = localStorage.getItem('emotion_test_age_group') || '29-35';
+            currentQuestions = getLocalizedQuestions(ageGroup, lang);
+
             updateLanguage();
+
+            // 重新渲染当前问题（包括选项）
+            renderQuestion();
 
             // 更新按钮状态
             document.querySelectorAll('.lang-btn').forEach(btn => {
@@ -394,7 +402,7 @@
 
         // 根据年龄段获取题目
         const ageGroup = localStorage.getItem('emotion_test_age_group') || '29-35';
-        const currentQuestions = getLocalizedQuestions(ageGroup, i18n.getLang());
+        let currentQuestions = getLocalizedQuestions(ageGroup, i18n.getLang());
         if (!currentQuestions) {
             alert('年龄段数据加载失败，请重新选择');
             window.location.href = 'age-select.html';
