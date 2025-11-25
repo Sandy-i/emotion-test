@@ -621,25 +621,39 @@
                 orientation = 'balanced';
             }
 
-            // 根据总分判断结果类型
-            let resultType;
-            if (totalScore >= 17) {
-                resultType = orientation === 'negative' ? 'A' : 'B';
-            } else if (totalScore >= 12) {
-                resultType = orientation === 'negative' ? 'C' : 'D';
-            } else if (totalScore >= 7) {
-                resultType = 'E';
-            } else {
-                resultType = 'F';
+            // 根据分数和导向找到对应的结果类型
+            const resultType = RESULT_TYPES.find(type =>
+                type.orientation === orientation &&
+                totalScore >= type.scoreRange[0] &&
+                totalScore <= type.scoreRange[1]
+            );
+
+            // 如果找不到匹配的结果类型，使用默认值
+            if (!resultType) {
+                console.error('No matching result type found for score:', totalScore, 'orientation:', orientation);
+                return null;
             }
 
+            // 构建雷达图数据
+            const radarData = {
+                '情绪精确度': Math.round((detailedCount / 10) * 100),
+                '自我觉察': Math.round((totalScore / 20) * 100),
+                '表达能力': Math.round(((detailedCount + singleCount) / 10) * 90),
+                '积极导向': Math.round((positiveCount / 10) * 100),
+                '情绪稳定性': Math.round(((10 - vagueCount) / 10) * 80),
+                '共情能力': Math.round((detailedCount / 10) * 85)
+            };
+
             return {
+                ...resultType,
                 score: totalScore,
-                type: resultType,
+                maxScore: 20,
+                percentage: Math.round((totalScore / 20) * 100),
+                stars: Math.ceil(totalScore / 4), // 0-5星评级
+                radarData,
                 detailedCount,
                 singleCount,
-                vagueCount,
-                answers
+                vagueCount
             };
         }
 
