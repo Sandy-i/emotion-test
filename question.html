@@ -514,9 +514,9 @@
 
             // 如果是最后一题，改变按钮文字
             if (currentQuestionIndex === 9) {
-                nextButton.textContent = '<span data-i18n="question.submitButton"></span>';
+                nextButton.innerHTML = '<span data-i18n="question.submitButton">' + i18n.t('question.submitButton') + '</span>';
             } else {
-                nextButton.textContent = '<span data-i18n="question.nextButton"></span>';
+                nextButton.innerHTML = '<span data-i18n="question.nextButton">' + i18n.t('question.nextButton') + '</span>';
             }
         }
 
@@ -541,7 +541,7 @@
                 renderQuestion();
             } else {
                 // 完成测试，计算结果并跳转到结果页
-                const result = calculateResult(answers, ageGroup);
+                const result = calculateResultFromQuestions(answers, currentQuestions);
                 localStorage.setItem('emotion_test_result', JSON.stringify(result));
                 window.location.href = 'share-gate-简化版.html';
             }
@@ -566,6 +566,83 @@
                 }
             }
         });
+
+        // 使用当前问题数据计算结果
+        function calculateResultFromQuestions(answers, questions) {
+            // 计算总分
+            let totalScore = 0;
+            let detailedCount = 0; // 2分选项次数
+            let singleCount = 0;   // 1分选项次数
+            let vagueCount = 0;    // 0分选项次数
+
+            let positiveCount = 0;  // 积极情绪倾向题目数量
+            let negativeCount = 0;  // 消极情绪倾向题目数量
+
+            answers.forEach((answer, index) => {
+                const question = questions[index];
+                const selectedOption = question.options[answer];
+
+                totalScore += selectedOption.score;
+
+                if (selectedOption.score === 2) detailedCount++;
+                else if (selectedOption.score === 1) singleCount++;
+                else vagueCount++;
+
+                // 简单判断情绪倾向
+                const optionText = selectedOption.text;
+                if (optionText.includes('开心') || optionText.includes('happy') ||
+                    optionText.includes('兴奋') || optionText.includes('excited') ||
+                    optionText.includes('满足') || optionText.includes('satisfied') ||
+                    optionText.includes('期待') || optionText.includes('looking forward') ||
+                    optionText.includes('平静') || optionText.includes('calm') ||
+                    optionText.includes('轻松') || optionText.includes('relaxed') ||
+                    optionText.includes('骄傲') || optionText.includes('proud') ||
+                    optionText.includes('高兴') || optionText.includes('delighted')) {
+                    positiveCount++;
+                } else if (optionText.includes('焦虑') || optionText.includes('anxious') ||
+                           optionText.includes('愤怒') || optionText.includes('angry') ||
+                           optionText.includes('失望') || optionText.includes('disappointed') ||
+                           optionText.includes('委屈') || optionText.includes('wronged') ||
+                           optionText.includes('恐慌') || optionText.includes('panic') ||
+                           optionText.includes('孤独') || optionText.includes('lonely') ||
+                           optionText.includes('痛苦') || optionText.includes('painful') ||
+                           optionText.includes('恐惧') || optionText.includes('fearful')) {
+                    negativeCount++;
+                }
+            });
+
+            // 判断情绪导向
+            let orientation;
+            if (positiveCount > negativeCount + 2) {
+                orientation = 'positive';
+            } else if (negativeCount > positiveCount + 2) {
+                orientation = 'negative';
+            } else {
+                orientation = 'balanced';
+            }
+
+            // 根据总分判断结果类型
+            let resultType;
+            if (totalScore >= 17) {
+                resultType = orientation === 'negative' ? 'A' : 'B';
+            } else if (totalScore >= 12) {
+                resultType = orientation === 'negative' ? 'C' : 'D';
+            } else if (totalScore >= 7) {
+                resultType = 'E';
+            } else {
+                resultType = 'F';
+            }
+
+            return {
+                score: totalScore,
+                type: resultType,
+                detailedCount,
+                singleCount,
+                vagueCount,
+                answers
+            };
+        }
+
     </script>
 </body>
 </html>
