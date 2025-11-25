@@ -2712,7 +2712,7 @@ if (typeof module !== 'undefined' && module.exports) {
 
 // 后备数据：原始中文数据（用于未翻译的年龄段）
 // 注意：这个需要test-data-by-age.js先加载
-const TEST_DATA_BY_AGE = window.TEST_DATA_BY_AGE || {};
+// TEST_DATA_BY_AGE 已在 test-data-by-age.js 中声明，这里直接使用
 
 // 获取当前语言的问题文本
 function getLocalizedQuestion(question, lang) {
@@ -2740,7 +2740,8 @@ function getLocalizedQuestions(ageGroup, lang) {
 
   // 如果没有找到，使用默认数据
   if (!questions || questions.length === 0) {
-    questions = TEST_DATA_BY_AGE[ageGroup] || TEST_DATA_BY_AGE['29-35'] || [];
+    const fallbackData = (typeof TEST_DATA_BY_AGE !== 'undefined') ? TEST_DATA_BY_AGE : {};
+    questions = fallbackData[ageGroup] || fallbackData['29-35'] || [];
   }
 
   return questions.map(q => getLocalizedQuestion(q, lang));
