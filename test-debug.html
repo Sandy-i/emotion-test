@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Debug Test</title>
+    <script src="i18n.js"></script>
+    <script src="test-data-by-age.js"></script>
+    <script src="test-data-i18n.js"></script>
+</head>
+<body>
+    <h1>数据加载测试</h1>
+    <div id="output"></div>
+
+    <script>
+        const output = document.getElementById('output');
+        let html = '';
+
+        // 检查 i18n
+        html += '<h2>1. i18n 检查</h2>';
+        html += '<p>当前语言: ' + i18n.getLang() + '</p>';
+
+        // 检查 TEST_DATA_I18N
+        html += '<h2>2. TEST_DATA_I18N 检查</h2>';
+        if (typeof TEST_DATA_I18N !== 'undefined') {
+            html += '<p>✅ TEST_DATA_I18N 已加载</p>';
+            html += '<p>年龄段: ' + Object.keys(TEST_DATA_I18N).join(', ') + '</p>';
+        } else {
+            html += '<p>❌ TEST_DATA_I18N 未定义</p>';
+        }
+
+        // 检查 TEST_DATA_BY_AGE
+        html += '<h2>3. TEST_DATA_BY_AGE 检查</h2>';
+        if (typeof TEST_DATA_BY_AGE !== 'undefined') {
+            html += '<p>✅ TEST_DATA_BY_AGE 已加载</p>';
+            html += '<p>年龄段: ' + Object.keys(TEST_DATA_BY_AGE).join(', ') + '</p>';
+        } else {
+            html += '<p>❌ TEST_DATA_BY_AGE 未定义</p>';
+        }
+
+        // 检查 getLocalizedQuestions 函数
+        html += '<h2>4. getLocalizedQuestions 函数检查</h2>';
+        if (typeof getLocalizedQuestions === 'function') {
+            html += '<p>✅ getLocalizedQuestions 函数已定义</p>';
+
+            // 测试获取数据
+            const testQuestions = getLocalizedQuestions('18-22', 'zh-CN');
+            html += '<p>获取到的题目数量: ' + (testQuestions ? testQuestions.length : 0) + '</p>';
+
+            if (testQuestions && testQuestions.length > 0) {
+                const q1 = testQuestions[0];
+                html += '<h3>第一题数据：</h3>';
+                html += '<p><strong>问题：</strong>' + q1.scenario + '</p>';
+                html += '<p><strong>选项数量：</strong>' + q1.options.length + '</p>';
+                html += '<p><strong>第一个选项：</strong>' + q1.options[0].text + '</p>';
+
+                // 测试英文
+                html += '<h3>英文版第一题：</h3>';
+                const testQuestionsEN = getLocalizedQuestions('18-22', 'en-US');
+                if (testQuestionsEN && testQuestionsEN.length > 0) {
+                    const q1en = testQuestionsEN[0];
+                    html += '<p><strong>问题：</strong>' + q1en.scenario + '</p>';
+                    html += '<p><strong>第一个选项：</strong>' + q1en.options[0].text + '</p>';
+                } else {
+                    html += '<p>❌ 英文数据获取失败</p>';
+                }
+            }
+        } else {
+            html += '<p>❌ getLocalizedQuestions 函数未定义</p>';
+        }
+
+        output.innerHTML = html;
+    </script>
+</body>
+</html>
