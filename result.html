@@ -113,7 +113,7 @@
         .radar-container {
             position: relative;
             width: 100%;
-            height: 220px;
+            height: 300px;
             margin-bottom: var(--space-3);
         }
 
@@ -339,19 +339,16 @@
     </div>
 
     <div class="bottom-actions">
-        <button class="action-btn action-btn-save" onclick="saveImage()">
-            <span data-i18n-icon="💾">💾</span> <span data-i18n="result.saveButton"></span>
-        </button>
-        <button class="action-btn action-btn-test" onclick="testAgain()">
+        <button class="action-btn action-btn-test" onclick="testAgain()" style="max-width: 400px; margin: 0 auto;">
             <span data-i18n-icon="🔄">🔄</span> <span data-i18n="result.retestButton"></span>
         </button>
     </div>
 
     <!-- i18n 多语言支持 -->
     <script src="i18n.js"></script>
-    <!-- html2canvas 库用于生成截图 -->
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
     <script src="test-data-by-age.js"></script>
+    <script src="result-types-i18n.js"></script>
     <script>
         // 页面加载时渲染
         window.addEventListener('DOMContentLoaded', () => {
@@ -380,8 +377,9 @@
                 if (answersStr) {
                     const answers = JSON.parse(answersStr);
                     const ageGroup = localStorage.getItem('emotion_test_age_group') || '29-35';
-                    const result = calculateResult(answers, ageGroup);
+                    let result = calculateResult(answers, ageGroup);
                     localStorage.setItem('emotion_test_result', JSON.stringify(result));
+                    result = updateResultTexts(result);
                     renderResult(result);
                 } else {
                     // 都没有，跳转回首页
@@ -398,9 +396,67 @@
                     updateLanguage();
                 }
             } else {
-                const result = JSON.parse(resultStr);
+                let result = JSON.parse(resultStr);
+                result = updateResultTexts(result);
                 renderResult(result);
             }
+        }
+
+        // 根据当前语言更新结果文本
+        function updateResultTexts(result) {
+            // 如果结果包含level和orientation信息，重新获取对应语言的文本
+            if (result.level && result.orientation && typeof getResultType !== 'undefined') {
+                const currentLang = i18n.getLang();
+                const localizedType = getResultType(result.level, result.orientation, result.score, currentLang);
+
+                if (localizedType) {
+                    result.title = localizedType.title;
+                    result.description = localizedType.description;
+                    result.advice = localizedType.advice;
+                }
+            }
+
+            // 转换雷达图数据为当前语言
+            if (result.radarData) {
+                const localizedRadarData = {};
+                const radarKeys = {
+                    emotionalAccuracy: 'radar.emotionalAccuracy',
+                    selfAwareness: 'radar.selfAwareness',
+                    expressionAbility: 'radar.expressionAbility',
+                    positiveOrientation: 'radar.positiveOrientation',
+                    emotionalStability: 'radar.emotionalStability',
+                    empathy: 'radar.empathy'
+                };
+
+                // 如果是新格式（固定键名）
+                if (result.radarData.emotionalAccuracy !== undefined) {
+                    for (const [key, i18nKey] of Object.entries(radarKeys)) {
+                        localizedRadarData[i18n.t(i18nKey)] = result.radarData[key];
+                    }
+                    result.radarData = localizedRadarData;
+                } else {
+                    // 如果是旧格式（已经是文本键名），尝试转换
+                    // 检测第一个键是否是中文
+                    const firstKey = Object.keys(result.radarData)[0];
+                    const isChinese = /[一-龥]/.test(firstKey);
+                    const currentLang = i18n.getLang();
+
+                    // 如果当前语言与数据语言不匹配，需要转换
+                    if ((isChinese && currentLang === 'en-US') || (!isChinese && currentLang === 'zh-CN')) {
+                        // 需要转换，使用固定顺序
+                        const values = Object.values(result.radarData);
+                        const keys = ['emotionalAccuracy', 'selfAwareness', 'expressionAbility',
+                                     'positiveOrientation', 'emotionalStability', 'empathy'];
+
+                        for (let i = 0; i < keys.length; i++) {
+                            localizedRadarData[i18n.t(radarKeys[keys[i]])] = values[i];
+                        }
+                        result.radarData = localizedRadarData;
+                    }
+                }
+            }
+
+            return result;
         }
 
         // 渲染结果页面
@@ -471,6 +527,10 @@
         // 语言切换和更新
         function switchLanguage(lang) {
             i18n.setLang(lang);
+
+            // 重新加载并渲染结果（以更新多语言内容）
+            loadAndRenderResult();
+
             updateLanguage();
 
             // 更新按钮状态
@@ -616,114 +676,6 @@
             });
         }
 
-        // 保存图片
-        async function saveImage() {
-            const button = event.target;
-
-            // 检查html2canvas是否加载
-            if (typeof html2canvas === 'undefined') {
-                alert('截图库加载失败，请刷新页面重试');
-                return;
-            }
-
-            try {
-                // 显示加载状态
-                button.disabled = true;
-                button.textContent = '生成中...';
-
-                // 获取要截图的元素
-                const element = document.getElementById('app');
-                const resultContent = document.querySelector('.result-content');
-
-                // 隐藏波浪装饰，避免截图时出现白色覆盖层
-                const waveDecoration = document.querySelector('.wave-decoration');
-                const originalWaveDisplay = waveDecoration ? waveDecoration.style.display : '';
-                if (waveDecoration) {
-                    waveDecoration.style.display = 'none';
-                }
-
-                // 移除result-content的padding-top，避免顶部空白
-                const originalPaddingTop = resultContent ? resultContent.style.paddingTop : '';
-                if (resultContent) {
-                    resultContent.style.paddingTop = '0';
-                }
-
-                // 给截图元素临时添加背景和内边距，确保截图美观
-                const originalBg = element.style.backgroundColor;
-                const originalPadding = element.style.padding;
-                element.style.backgroundColor = '#F8F9FA';
-                element.style.padding = '32px 24px';
-
-                // 配置选项
-                const options = {
-                    backgroundColor: '#F8F9FA', // 浅灰背景，与页面一致
-                    scale: 2, // 提高清晰度
-                    useCORS: true, // 允许跨域图片
-                    allowTaint: true, // 允许污染的canvas
-                    logging: false,
-                    width: element.scrollWidth,
-                    height: element.scrollHeight,
-                    windowWidth: element.scrollWidth,
-                    windowHeight: element.scrollHeight,
-                    // 忽略波浪装饰元素
-                    ignoreElements: (el) => {
-                        return el.classList && el.classList.contains('wave-decoration');
-                    }
-                };
-
-                // 生成截图
-                const canvas = await html2canvas(element, options);
-
-                // 恢复原始样式
-                if (waveDecoration) {
-                    waveDecoration.style.display = originalWaveDisplay;
-                }
-                if (resultContent) {
-                    resultContent.style.paddingTop = originalPaddingTop;
-                }
-                element.style.backgroundColor = originalBg;
-                element.style.padding = originalPadding;
-
-                // 转换为blob并下载
-                canvas.toBlob((blob) => {
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.download = `情绪颗粒度测试结果_${new Date().getTime()}.png`;
-                    link.href = url;
-                    link.click();
-
-                    // 清理
-                    URL.revokeObjectURL(url);
-
-                    // 恢复按钮状态
-                    button.disabled = false;
-                    button.innerHTML = '<span data-i18n-icon="💾">💾</span> <span data-i18n="result.saveButton"></span>';
-                }, 'image/png', 1.0);
-
-            } catch (error) {
-                console.error('截图失败:', error);
-                alert('截图失败，请重试或使用长按截图方式保存');
-
-                // 恢复按钮状态
-                button.disabled = false;
-                button.innerHTML = '<span data-i18n-icon="💾">💾</span> <span data-i18n="result.saveButton"></span>';
-
-                // 确保恢复原始样式
-                const waveDecoration = document.querySelector('.wave-decoration');
-                if (waveDecoration) {
-                    waveDecoration.style.display = '';
-                }
-                const resultContent = document.querySelector('.result-content');
-                if (resultContent) {
-                    resultContent.style.paddingTop = '';
-                }
-                const element = document.getElementById('app');
-                if (element) {
-                    element.style.backgroundColor = '';
-                    element.style.padding = '';
-                }
-            }
-        }
 
         // 再测一次
         function testAgain() {

@@ -61,6 +61,16 @@ const i18n = {
                 privacyNote: '你的选择仅用于个性化测试，不会被分享',
             },
 
+            // 雷达图标签
+            radar: {
+                emotionalAccuracy: '情绪精确度',
+                selfAwareness: '自我觉察',
+                expressionAbility: '表达能力',
+                positiveOrientation: '积极导向',
+                emotionalStability: '情绪稳定性',
+                empathy: '共情能力'
+            },
+
             // 问题页
             question: {
                 progressText: '答题进度',
@@ -146,6 +156,16 @@ const i18n = {
                 age5: '46+ years',
                 age5desc: 'Rich life experience / Seeking balance & wisdom',
                 privacyNote: 'Your selection is only used for personalized testing and will not be shared',
+            },
+
+            // Radar Chart Labels
+            radar: {
+                emotionalAccuracy: 'Emotional Accuracy',
+                selfAwareness: 'Self-awareness',
+                expressionAbility: 'Expression Ability',
+                positiveOrientation: 'Positive Orientation',
+                emotionalStability: 'Emotional Stability',
+                empathy: 'Empathy'
             },
 
             // Question Page
