@@ -541,7 +541,18 @@
                 renderQuestion();
             } else {
                 // 完成测试，计算结果并跳转到结果页
+                console.log('开始计算结果...');
+                console.log('answers:', answers);
+                console.log('currentQuestions:', currentQuestions);
+
                 const result = calculateResultFromQuestions(answers, currentQuestions);
+                console.log('计算结果:', result);
+
+                if (!result) {
+                    alert('计算结果失败，请检查控制台');
+                    return;
+                }
+
                 localStorage.setItem('emotion_test_result', JSON.stringify(result));
                 window.location.href = 'share-gate-简化版.html';
             }
@@ -569,6 +580,16 @@
 
         // 使用当前问题数据计算结果
         function calculateResultFromQuestions(answers, questions) {
+            console.log('calculateResultFromQuestions called');
+            console.log('RESULT_TYPES available:', typeof RESULT_TYPES !== 'undefined');
+
+            // 如果 RESULT_TYPES 未定义，尝试使用内联版本
+            if (typeof RESULT_TYPES === 'undefined') {
+                console.error('RESULT_TYPES is not defined! Using fallback.');
+                alert('数据加载失败，请刷新页面重试');
+                return null;
+            }
+
             // 计算总分
             let totalScore = 0;
             let detailedCount = 0; // 2分选项次数
